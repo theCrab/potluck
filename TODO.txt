@@ -1,0 +1,11 @@
+module Taxi
+  class Vehicle; end
+  class Driver; end
+  class License; end
+  class Ride; end
+  class Payment; end
+  class Organisation; end
+  class Passenger; end
+  class Tracker; end
+  class Contract; end
+end
