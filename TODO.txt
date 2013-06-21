@@ -1,11 +1,62 @@
 module Taxi
   class Vehicle; end
   class Driver; end
+  class Document; end
   class License; end
-  class Ride; end
+  class Ride; end # Tracks the progress of the Ride using StateMachine
+  class Booking; end
+  class Dispatch; end # Sends out the latest Booking to the relevant Driver and starts the Ride StateMachine
   class Payment; end
   class Organisation; end
-  class Passenger; end
-  class Tracker; end
-  class Contract; end
+  class Passenger; end # Tracks Passenger details so we always know our customers
+  class Tracker; end # Implements GeoLocation of Vehicle for Dispatch
+  class Contract; end # Inherits Booking but tracks regularity
+  class Address; end
+  class PhoneNumber; end
+  class Vehicle::Mileage; end
 end
+
+module Taxi
+  class Vehicle
+    attr_accessor :make, :model, :type, :date_of_reg, :reg_plate, :number_of_seats
+  end
+end
+
+module Taxi
+  class Driver
+    attr_accessor :driving_license, :taxi_badge, :vehicle, :address, :phone_number, :organisation_number
+  end
+end
+
+Module Taxi
+  class Ride
+    include Taxi::Booking, Taxi::Payment, Taxi::Vehicle
+
+    attr_accessor :pick_up_point, :drop_off_point, :pick_up_time, :drop_off_time, :passenger, :fare, :number_of_passengers
+
+  end
+end
+
+Module Taxi
+  class Passenger
+    include Taxi::Address, Taxi::PhoneNumber
+
+  end
+end
+
+Module Taxi
+  class Booking
+    include Taxi::Fare, Taxi::Passenger, Taxi::Address
+
+    vehicle
+    pick_up_address
+    pick_up_datetime
+    drop_off_address
+    drop_off_datetime
+    booking_number
+    passenger
+    driver
+    recuring_contract?
+  end
+end
+

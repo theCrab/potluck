@@ -5,6 +5,7 @@
 #
 require "devtools"
 require "taxi"
+require "taxi/factories"
 
 Devtools.init_spec_helper
 
@@ -15,6 +16,7 @@ RSpec.configure do |config|
   config.filter_run :focus
 
   config.extend(TaxiHelper)
+  config.include FactoryGirl::Syntax::Methods
 
   # Run specs in random order to surface order dependencies. If you find an
   # order dependency and want to debug it, you can fix the order by providing

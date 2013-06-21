@@ -1,4 +1,4 @@
-# Taxi::Spec
+# Taxi
 
 TODO: Write a gem description
 
@@ -6,7 +6,7 @@ TODO: Write a gem description
 
 Add this line to your application's Gemfile:
 
-    gem 'taxi-spec'
+    gem 'taxi'
 
 And then execute:
 
