@@ -1,13 +1,13 @@
 module Taxi
   class License
-    attr_accessor :number, :expiry_date
+    include DataMapper::Resource
 
-    def initialize(number)
-      @number, @expiry_date = number, expiry_date
-    end
+    property :expiry_on, Date, required: true
+    property :type, Enum[:driving, :insurance, :driver_badge, :vehicle_badge]
+    property :start_on, Date, required: true
 
-    def self.expiry_date
-      @expiry_date ||= Date.today - 5
-    end
+    belongs_to :person
+    belongs_to :vehicle
+    # belongs_to :company
   end
 end

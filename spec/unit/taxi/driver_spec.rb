@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Taxi::Driver do
+describe Taxi::Person do
   it "should have a valid driving license"
   it "should have a valid taxi badge (PCO Lincense Number)"
   it "should have a DOB"
