@@ -3,11 +3,14 @@ require "faker"
 
 FactoryGirl.define do
   factory :taxi do
-    factory :vehicle do |v|
-      v.registration { Faker::Name.name }
-      v.make { Faker::Lorem.word }
-      v.model { Faker::Lorem.word }
-      v.owner { vehicle_owner }
+    factory :vehicle do
+      registration { 'N880 PFW' }
+      make { 'BMW' }
+      type { :MPV }
+      date_of_reg { Date.today.to_s }
+      taxi_plate { 'JVMNKD1209' }
+      number_of_seats { 7 }
+      colour { 'Maroon' }
 
     end
 
@@ -15,7 +18,19 @@ FactoryGirl.define do
       first_name { Faker::Name.first_name }
       last_name { Faker::Name.last_name }
       email { Faker::Internet.email }
-      user_name { Faker::Internet.user_name }
+      phone { Faker::PhoneNumber.phone_number }
+      mobile { Faker::PhoneNumber.phone_number }
+      ni_number { 'SH269093B' }
+      dob { Date.today }
+      caller_number { 'DR024' }
+    end
+
+    factory :license do
+      number { 'NPWD1098' }
+      provider { 'DVLA' }
+      starts_on { Date.today }
+      expires_on { Date.today + 30 }
+      type { :mot }
     end
 
     factory :organisation, aliases: [:company] do
@@ -26,14 +41,16 @@ FactoryGirl.define do
 
     factory :address, aliases: [:passenger_address, :organisation_address, :vehicle_address] do
       street_address { Faker::Address.street_address }
+      locality { Faker::Address.secondary_address }
       city { Faker::Address.city }
-      county { Faker::Address.county }
+      county { Faker::Address.state }
       postcode { Faker::Address.postcode }
       country "United Kingdom"
     end
 
     factory :phone_number, aliases: [:mobile_phone, :house_phone, :office_phone] do
-      Faker::PhoneNumber.phone_number
+      phone Faker::PhoneNumber.phone_number
+      mobile Faker::PhoneNumber.phone_number
     end
 
     factory :email do

@@ -6,6 +6,9 @@
 require "devtools"
 require "taxi"
 require "taxi/factories"
+require 'pry'
+
+RACK_ENV = 'test'
 
 Devtools.init_spec_helper
 
