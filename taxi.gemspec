@@ -21,6 +21,7 @@ Gem::Specification.new do |gem|
   gem.required_ruby_version = '>= 1.9.3'
 
   # gem.add_dependency 'inflecto', '~> 0.0.2'
+  gem.add_dependency 'adamantium'
   gem.add_dependency 'equalizer', '~> 0.0.5'
   gem.add_dependency 'datamapper', '~> 1.2.0'
 

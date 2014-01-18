@@ -28,3 +28,107 @@ function(e,t){function n(e,t,n,r){var i,o,a,s,u,l,c,f,h,m;if((t?t.ownerDocument|
 
 
 console.log("hi from pos_front"),$(document).ready(function(){console.log("pos_front ready!")}),$(function(){function t(t,i){function a(t,i){if(this.api_key=i,this.dom=$(t),0==this.dom.length)throw"pos_selector failed: "+t;var a=this.dom.find("div.pos_keypad_num");a.click($.proxy(this.numpad_click,this));var o=this.dom.find("div.pos_product_tile").find("div.content");o.on("click",$.proxy(this.product_click,this)),this.txtTotal=this.dom.find("#pos_total"),this.txtInput=this.dom.find("#pos_input"),this.order_detail=this.dom.find("#pos_order_details"),$.ajax({type:"GET",url:"/api/variants",success:$.proxy(this.load_variants,this)}),this.order_number="R667135804",this.total=0,this.lines=[],this.update_total_req()}function o(t){var i=$(t.target).attr("data-key");console.log("numpad_click: "+i),this.txtInput.val(this.txtInput.val()+i)}function e(t){var i=$(t.target).attr("data-product-id");console.log("product click: "+i),this.add_line_req(i)}function s(){}function n(t){$.ajax({type:"POST",url:"/api/orders",data:{token:this.api_key},success:$.proxy(this.create_order,this,t||{})})}function r(t,i){this.order=i,this.order_number=i.number,this.update_total_done(i),t.callback&&t.callback.apply(t.scope,t.arguments)}function d(){return this.order?($.ajax({type:"POST",url:"/api/orders/"+this.order_number+"/line_items?token="+this.api_key,data:{token:this.api_key,"line_item[variant_id]":"1","line_item[quantity]":"2"},success:$.proxy(this.add_line,this),failure:function(){}}),void 0):(this.create_order_req({callback:this.add_line_req,scope:this,args:arguments}),void 0)}function l(t){var i=parseFloat(t.variant.price)*parseFloat(t.quantity);this.order_detail.append('<div class="order_line">'+t.variant.name+" x "+t.quantity+"<br/>"+t.variant.sku+"&nbsp;&nbsp;&nbsp;&nbsp;$"+i+"</div> "),this.add_total(i)}function c(){$.ajax({type:"GET",url:"/api/orders/"+this.order_number+"?token="+this.api_key,success:$.proxy(this.update_total_done,this)})}function h(t){this.total=parseFloat(t.item_total),this.txtTotal.val("$"+t.item_total)}function p(t){this.total+=parseFloat(t),this.txtTotal.val("$"+this.total)}this.txtInput=null,this.init=a,this.numpad_click=o,this.product_click=e,this.load_variants=s,this.create_order_req=n,this.create_order=r,this.add_line_req=d,this.add_line=l,this.update_total_req=c,this.update_total_done=h,this.add_total=p,this.init(t,i)}$.namespace("org.omnigate"),org.omnigate.retail_pos=t});
+
+
+
+// Google Maps Waypoints
+
+
+  var directionDisplay;
+  var directionsService = new google.maps.DirectionsService();
+  var map;
+
+  function initialize() {
+    directionsDisplay = new google.maps.DirectionsRenderer();
+    var chicago = new google.maps.LatLng(41.850033, -87.6500523);
+    var myOptions = {
+      zoom: 6,
+      mapTypeId: google.maps.MapTypeId.ROADMAP,
+      center: chicago
+    }
+    map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+    directionsDisplay.setMap(map);
+    calcRoute();
+  }
+
+  function calcRoute() {
+
+    var request = {
+        // from: Blackpool to: Preston to: Blackburn
+        origin: "Blackpool",
+        destination: "Blackburn",
+        waypoints: [{
+          location: "Preston",
+          stopover:true}],
+        optimizeWaypoints: true,
+        travelMode: google.maps.DirectionsTravelMode.WALKING
+    };
+    directionsService.route(request, function(response, status) {
+      if (status == google.maps.DirectionsStatus.OK) {
+        directionsDisplay.setDirections(response);
+        var route = response.routes[0];
+        var summaryPanel = document.getElementById("directions_panel");
+        summaryPanel.innerHTML = "";
+        // For each route, display summary information.
+        for (var i = 0; i < route.legs.length; i++) {
+          var routeSegment = i + 1;
+          summaryPanel.innerHTML += "<b>Route Segment: " + routeSegment + "</b><br />";
+          summaryPanel.innerHTML += route.legs[i].start_address + " to ";
+          summaryPanel.innerHTML += route.legs[i].end_address + "<br />";
+          summaryPanel.innerHTML += route.legs[i].distance.text + "<br /><br />";
+        }
+        computeTotalDistance(response);
+      } else {
+        alert("directions response "+status);
+      }
+    });
+  }
+
+function computeTotalDistance(result) {
+  var totalDist = 0;
+  var totalTime = 0;
+  var myroute = result.routes[0];
+
+  for (i = 0; i < myroute.legs.length; i++) {
+    totalDist += myroute.legs[i].distance.value;
+    totalTime += myroute.legs[i].duration.value;
+  }
+
+  totalDist = totalDist / 1000.
+  document.getElementById("total").innerHTML = "total distance is: "+ totalDist + " km<br>total time is: " + (totalTime / 60).toFixed(2) + " minutes";
+}
+
+var bookingForm = document.getElementById('booking_form');
+
+
+var Booking = {
+  'pickup_address': $this.bookingForm['pickup_address'].val(),
+  'destin_address': $(this).bookingForm['destin_address'].val() ,
+  'pickup_datetime': $(this),
+  'waypoints': [],
+  'note_for_driver': '',
+  'note_for_office': '',
+  'passenger': { 'name': '', 'phone': '', 'email': '' },
+  'passengers': 3
+
+}
+
+bookingForm.on('click', '.submit', function(event) {
+  event.preventDefault();
+  /* Act on the event */
+  $.ajax({
+    url: '/bookings',
+    type: 'POST',
+    dataType: 'json',
+    data: Booking.to_json
+  })
+  .done(function() {
+    console.log("success");
+  })
+  .fail(function() {
+    console.log("error");
+  })
+  .always(function() {
+    console.log("complete");
+  });
+});

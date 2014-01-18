@@ -41,15 +41,42 @@ The Booking
 
 The Address
 ============
-1. Street 1
-2. Street 2
-3. City
-4. County
-5. Post-code
-6. Country
+class Address < ContactDetail
+  include DataMapper::Resource
+
+  property :id, Serial
+  property :street_1, String
+  property :street_2, String
+  property :city, String
+  property :county, String
+  property :post-code, String
+  property :country, String
+end
 
 E-mail
 ======
-1. address
-2. type (primary, work, home)
-3. active?
+class Email
+  include ContactDetail, DataMapper::Resource
+
+  property :id, Serial
+  property :content, String
+  property :type, Enum[:primary, :work, :home], default: :primary
+  property :active, Boolean, default: true
+end
+
+Phone
+======
+class Phone
+  include ContactDetail, DataMapper::Resource
+
+  property :id, Serial
+  property :number, Integer
+  property :type, Enum[:primary, :work, :home], default: :primary
+  property :active, Boolean, default: true
+end
+
+class ContactDetail
+  def type
+    raise NotImplementedError, 'Ask the subclass, or implement it yourself'
+  end
+end

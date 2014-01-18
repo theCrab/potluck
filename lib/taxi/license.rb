@@ -1,6 +1,6 @@
 module Taxi
   class License
-    include DataMapper::Resource
+    include Adamantium, DataMapper::Resource
 
     property :id, Serial
     property :number, String , required: true

@@ -1,20 +1,118 @@
 module Taxi
-  class Vehicle; end
-  class Driver; end
-  class Document; end
-  class License; end
-  class Ride; end # Tracks the progress of the Ride using StateMachine
-  class Booking; end
-  class Dispatch; end # Sends out the latest Booking to the relevant Driver and starts the Ride StateMachine
-  class Payment; end
-  class Organisation; end
-  class Passenger; end # Tracks Passenger details so we always know our customers
-  class Tracker; end # Implements GeoLocation of Vehicle for Dispatch
-  class Contract; end # Inherits Booking but tracks regularity
-  class Address; end
-  class PhoneNumber; end
-  class Vehicle::Mileage; end
+  class Vehicle
+    include Taxi::Organisation.get(organisation), Taxi::Driver.get(person)
+
+    class < self
+
+      property :id, Serial
+      property :registration, String, required: true
+      property :make, String, required: true
+      property :registration_date, Date, required: true
+      property :colour, String, required: true
+
+      timestamps :created_at, :updated_at
+
+      # Associations
+      has n, :licenses # taxi_plate, mot, road_tax, insurance
+      # has n, :drivers # taxi_badge, driving_license, insurance
+    end
+  end
+
+  class Driver
+  end
+
+  class Document
+  end
+
+  class License
+
+  end
+
+  class Ride
+  end # Tracks the progress of the Ride using StateMachine
+
+  class Booking
+  end
+
+  class Dispatch
+  end # Sends out the latest Booking to the relevant Driver and starts the Ride StateMachine
+
+  class Payment
+    include DataMapper::Resource
+
+    def initialize(source)
+      raise SourceMissingError, 'The Payment Source class is not provided ' unless source && source.class == Taxi::Booking
+      @source = source
+    end
+
+    property :id, Serial
+    property :amount, Decimal
+    property :source, String
+    property :source_id, Integer
+
+    property :created_at, DateTime
+    property :updated_at, DateTime
+
+    before :valid?, :check_source
+
+    private
+    def check_source
+      self.source, self.source_id, self.amount = @source.to_s, @source.id, @source.amount.to_f
+    end
+  end
+
+  class Fare
+    # Used to determine the amount of fare a passenger pays for a ride
+    include Taxi::GeoMap::Zone
+
+    def initialize(pickup, destination)
+      @pickup, @destination = pickup, destination
+    end
+
+    def by_time(time_taken)
+      # Time * price_per_minute
+      time_taken * price_per_minute
+    end
+
+    def by_zone
+      # This is a configuration issue
+      zone(a).price.to.zone(b)
+    end
+
+    def distance(a,b)
+      zone(@pickup) - zone(@destination)
+    end
+
+    def zone(z ||= nil)
+
+    end
+  end #Fare
+
+  class Organisation
+  end
+
+  class Passenger
+  end # Tracks Passenger details so we always know our customers
+
+  class Tracker
+  end # Implements GeoLocation of Vehicle for Dispatch
+
+  class Contract
+  end # Inherits Booking but tracks regularity
+
+  class Address
+  end
+
+  class PhoneNumber
+  end
+
+  class Vehicle
+    class Mileage
+    end
+  end
 end
+
+## ====================
 
 module Taxi
   class Vehicle
@@ -59,4 +157,57 @@ Module Taxi
     recuring_contract?
   end
 end
+
+## ================================================
+class Organisation
+  include DataMapper::Resource
+
+  property :id, Serial
+
+  has n, :roles, through: Resource
+end
+
+class Role
+  include DataMapper::Resource, Taxi::Permision
+
+  property :id, Serial
+  property :name, String, required: true
+
+  ## Defining roles
+  # An admin can manage org, drivers, cars
+  # A person can manage his profile
+  # A dispatcher can manage bookings
+  # @api private
+  #
+  has n, :permissions
+  has n, :orgs, through: Resource
+end
+
+class Permission
+  attr_reader :manage, :read, :edit, :create
+
+  def initialize(user=current_user, *args)
+    @user, @role, @resources = user, args[0], args[1..-1]
+  end
+
+  def can(manage, resources)
+    roles = @user.roles.compact
+    !roles.empty? && roles.include(@role) && resources.compact.any?{ |r| r==@resource }
+    case
+    when roles.include(manage) == role then true
+    when roles.include() == role then true
+    when roles.include(manage) == role then true
+    when roles.include(read) == role then true
+    default false
+    end
+  end
+end
+
+class OrgRole
+  include DataMapper::Resource
+
+  belongs_to :org, 'Org', key: true
+  belongs_to :role, 'Role', key: true
+end
+## ===============================================
 

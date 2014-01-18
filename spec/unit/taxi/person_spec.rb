@@ -1,20 +1,17 @@
 require "spec_helper"
 
 describe Taxi::Person do
-  let(:user) { Taxi::Person.create(attributes_for(:person)) }
+  subject(:user) { Taxi::Person.create(attributes_for(:person)) }
   after(:all) do
     user.destroy
   end
 
   context "on create" do
-    # binding.pry
-    it "should be valid" do
-      user.should be_valid
-      user.should be_instance_of(Taxi::Person)
-    end
-
+    it { should be_valid }
+    it { should be_instance_of(Taxi::Person) }
+    # its(:ni_number) { should_not be('') }
     it "should have a valid NI Number" do
-      expect(user.ni_number).to eql('SH269093B')
+      expect(user.ni_number).not_to eql('')
     end
 
     it "should have a DOB" do
@@ -31,13 +28,13 @@ describe Taxi::Person do
     end
 
     it "should have a Call Sign" do
-      expect(user.caller_number).to include('DR', '0')
-      expect(user.caller_number).to start_with('DR')
+      expect(user.callsign).to include('D')
+      expect(user.callsign).to start_with('D')
     end
   end
 
   context "Contact details" do
-    let(:address) { Taxi::Address.new(attributes_for(:address)) }
+    subject(:address) { Taxi::Address.new(attributes_for(:address)) }
     after(:all) do
       address.destroy
     end
@@ -50,22 +47,46 @@ describe Taxi::Person do
       expect(user.email).not_to be_nil
     end
 
-    it "should have a valid address" do
+    it "should not save an address that does not belong to a person" do
+      # binding.pry
+      expect { address.save }.to raise_error(DataMapper::SaveFailureError)
+    end
+
+    it "should save a person's address" do
       address.person = user
-      address.save
+      expect(address.save).to be_true
+      # address.save
       expect(address.person_id).to eql(user.id)
     end
   end
 
-  context "Licenses" do
-    it "should have a valid 'Insurance policy'"
-    it "should have a valid 'Taxi badge (PCO Lincense Number)'"
-    it "should have a valid 'Driving License'"
-  end
-  context "Company Roles" do
-    it "should belong to an Organisation"
-    it "should have a role(s)" #do
-      # expect(user.roles).to include()
-    #end
-  end
+  # context "Licenses" do
+  #   it "should be a valid 'Insurance policy'"
+  #   it "should be a valid 'Taxi badge (PCO Lincense Number)'"
+  #   it "should be a valid 'Driving License'"
+  # end
+
+  # context "User Roles" do
+  # default system roles are %w|driver dispatcher owner passenger|
+  #   let(:organisation) { user.organisations.create(name: 'BBH Taxis') }
+  #   let(:role) { organisation.roles.create(name: 'Driver') }
+  #   it "should belong to an Organisation" do
+  #     expect(user.organisations).to include(organisation)
+  #   end
+
+  #   it "should have a role(s)" do
+  #    expect(user.roles).to include(role)
+  #   end
+  # end
+
+  # context "Company Roles" do
+  #   let(:organisation) { user.organisations.create(name: 'BBH Taxis') }
+  #   it "should belong to an Organisation" do
+  #     expect(user.organisations).to include(organisation)
+  #   end
+
+  #   it "should have a role(s)" do
+  #    expect(user.roles).to include(role)
+  #   end
+  # end
 end

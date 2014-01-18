@@ -1,6 +1,8 @@
 require "factory_girl"
 require "faker"
 
+Faker::Config.locale = 'en-gb'
+
 FactoryGirl.define do
   factory :taxi do
     factory :vehicle do
@@ -20,9 +22,8 @@ FactoryGirl.define do
       email { Faker::Internet.email }
       phone { Faker::PhoneNumber.phone_number }
       mobile { Faker::PhoneNumber.phone_number }
-      ni_number { 'SH269093B' }
+      sequence(:ni_number) { |n| "SH269093#{n}" }
       dob { Date.today }
-      caller_number { 'DR024' }
     end
 
     factory :license do

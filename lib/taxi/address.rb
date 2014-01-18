@@ -1,6 +1,7 @@
 module Taxi
+
   class Address
-    include DataMapper::Resource
+    include DataMapper::Resource #Adamantium,
 
     property :id,             Serial
     property :street_address, String, required: true
@@ -15,5 +16,6 @@ module Taxi
 
     belongs_to :person
     # belongs_to :vehicle
+    # belongs_to :organisation
   end
 end
